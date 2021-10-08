@@ -25,7 +25,7 @@ union _program
 Program* loadProgrqam(FILE* file) {
 	Program* program = (Program*)malloc(sizeof(Program));
 	fread(program, sizeof(program->common), 1, file);
-	switch (getClass(program)) {
+	switch (get_class(program)) {
 	case ELFCLASS32:
 		loadProgram32(file, &program->x32);
 		break;
@@ -39,7 +39,7 @@ Program* loadProgrqam(FILE* file) {
 }
 
 void freeProgram(Program* program) {
-	switch (getClass(program)) {
+	switch (get_class(program)) {
 	case ELFCLASSNONE:
 		break;
 	case ELFCLASS32:
@@ -53,54 +53,104 @@ void freeProgram(Program* program) {
 	free(program);
 }
 // Elf Common Header
-const char* getMagic(const Program* program) {
+const char* get_magic(const Program* program) {
 	return (const char*)program->common.e_ident;
 }
 
-uint8_t getClass(const Program* program) {
+Half get_class(const Program* program) {
 	return program->common.e_ident[EI_CLASS];
 }
 
-uint8_t getData(const Program* program) {
+Half get_data(const Program* program) {
 	return program->common.e_ident[EI_DATA];
 }
 
-uint8_t getElfVersion(const Program* program) {
+Half get_ElfVersion(const Program* program) {
 	return program->common.e_ident[EI_VERSION];
 }
 
-uint8_t getOSABI(const Program* program) {
+Half get_OSABI(const Program* program) {
 	return program->common.e_ident[EI_OSABI];
 }
 
-uint8_t getABIVERSION(const Program* program) {
+Half get_ABIVERSION(const Program* program) {
 	return program->common.e_ident[EI_ABIVERSION];
 }
 
-uint16_t getType(const Program* program) {
+Word get_Flags(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_flags : program->x64.header.e_flags;
+}
+
+Half get_ehsize(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_ehsize : program->x64.header.e_ehsize;
+}
+
+Half get_phentsize(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_phentsize : program->x64.header.e_phentsize;
+}
+
+Half get_phnum(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_phnum : program->x64.header.e_phnum;
+}
+
+Half get_shentsize(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_shentsize : program->x64.header.e_shentsize;
+}
+
+Half get_shnum(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_shnum : program->x64.header.e_shnum;
+}
+
+Half get_shstrndx(const Program* program) {
+	return get_class(program) == ELFCLASS32 ? program->x32.header.e_shstrndx : program->x64.header.e_shstrndx;
+}
+
+Word get_type(const Program* program) {
 	return program->common.e_type;
 }
 
-uint16_t getMachine(const Program* program) {
+Word get_machine(const Program* program) {
 	return program->common.e_machine;
 }
 
-uint16_t getVersion(const Program* program) {
+Word get_version(const Program* program) {
 	return program->common.e_machine;
 }
 
-bool checkMagic(const Program* program) {
+bool check_magic(const Program* program) {
 	return memcmp(program->common.e_ident, ELFMAG, SELFMAG) == 0;
 }
 
-bool checkElfVersion(const Program* program) {
+bool check_ElfVersion(const Program* program) {
 	return program->common.e_ident[EI_VERSION] == EV_CURRENT;
 }
 
-void setType(Program* program, uint16_t e_type) {
+void set_type(Program* program, Word e_type) {
 	program->common.e_type = e_type;
 }
 
-void setMachine(Program* program, uint16_t e_machine) {
+void set_machine(Program* program, Word e_machine) {
 	program->common.e_machine = e_machine;
 }
+
+#define SET_HEADER(field) \
+if (get_class(program) == ELFCLASS32) { \
+	program->x32.header.field = field; \
+} else { \
+	program->x64.header.field = field; \
+}
+
+#define SETTER(field, t) \
+void set_##field(Program* program, t e_##field) { \
+	SET_HEADER(e_##field) \
+}
+
+SETTER(flags, Word)
+SETTER(ehsize, Half)
+SETTER(phentsize, Half)
+SETTER(phnum, Half)
+SETTER(shentsize, Half)
+SETTER(shnum, Half)
+SETTER(shstrndx, Half)
+
+#undef SET_HEADER
