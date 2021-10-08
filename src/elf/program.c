@@ -22,6 +22,12 @@ union _program
 	} common;
 };
 
+Program* loadProgrqam(FILE* file) {
+	Program* program = (Program*)malloc(sizeof(Program));
+	fread(program, sizeof(program->common), 1, file);
+	return program; 
+}
+
 void freeProgram(Program* program) {
 	switch (getClass(program)) {
 	case ELFCLASSNONE:
@@ -37,6 +43,10 @@ void freeProgram(Program* program) {
 	free(program);
 }
 // Elf Common Header
+const char* getMagic(const Program* program) {
+	return (const char*)program->common.e_ident;
+}
+
 uint8_t getClass(const Program* program) {
 	return program->common.e_ident[EI_CLASS];
 }

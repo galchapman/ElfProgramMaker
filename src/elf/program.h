@@ -8,11 +8,12 @@
 
 typedef union _program Program;
 
-Program* load(FILE* file);
+Program* loadProgrqam(FILE* file);
 void freeProgram(Program*);
 
 // Elf common header functions
 // getters
+const char* getMagic(const Program*);
 uint8_t getClass(const Program*);
 uint8_t getData(const Program*);
 uint8_t getElfVersion(const Program*);
