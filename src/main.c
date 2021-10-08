@@ -2,16 +2,21 @@
 #include <elf.h>
 #include "elf/program.h"
 
+#define COLOR_RED(s) "\033[91m" s "\033[0m"
+
 int main(int argc, char* argv[]) {
-	if (argc != 2) {
-		fprintf(stderr, ERROR_RED("Usage: %s <target>") , argv[0]);
+	if (argc < 2) {
+		fprintf(stderr, COLOR_RED("Usage: %s <target>") , argv[0]);
 		return 1;
 	}
 
-	FILE* pf = fopen("targets/bin/a", "rb");
-	Program* program = loadProgrqam(pf);
-	fclose(pf);
+	for (int i = 1; i < argc; i++) {
 
-	freeProgram(program);
+		FILE* pf = fopen(argv[i], "rb");
+		Program* program = loadProgrqam(pf);
+		fclose(pf);
+
+		freeProgram(program);
+	}
 	return 0;
 }
