@@ -11,7 +11,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	for (int i = 1; i < argc; i++) {
-
 		FILE* pf = fopen(argv[i], "rb");
 		Program* program = loadProgrqam(pf);
 		fclose(pf);

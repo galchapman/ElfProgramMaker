@@ -25,6 +25,16 @@ union _program
 Program* loadProgrqam(FILE* file) {
 	Program* program = (Program*)malloc(sizeof(Program));
 	fread(program, sizeof(program->common), 1, file);
+	switch (getClass(program)) {
+	case ELFCLASS32:
+		loadProgram32(file, &program->x32);
+		break;
+	case ELFCLASS64:
+		loadProgram64(file, &program->x64);
+		break;
+	default:
+		break;
+	}
 	return program; 
 }
 
