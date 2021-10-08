@@ -1,8 +1,8 @@
-.o
-.out
-.exe
-.a
-.so
-.elf
+*.o
+*.out
+*.exe
+*.a
+*.so
+*.elf
 
 build/
