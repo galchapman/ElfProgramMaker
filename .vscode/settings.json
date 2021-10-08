@@ -5,6 +5,8 @@
 		"stdio.h": "c",
 		"elf.h": "c",
 		"program64.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"stdbool.h": "c",
+		"stddef.h": "c"
 	}
 }

@@ -23,7 +23,7 @@ union _program
 };
 
 void freeProgram(Program* program) {
-	switch (checkClass(program)) {
+	switch (getClass(program)) {
 	case ELFCLASSNONE:
 		break;
 	case ELFCLASS32:
@@ -36,11 +36,51 @@ void freeProgram(Program* program) {
 	};
 	free(program);
 }
-
-int checkMagic(const Program* program) {
-	return memcmp(program->common.e_ident, ELFMAG, SELFMAG);
+// Elf Common Header
+uint8_t getClass(const Program* program) {
+	return program->common.e_ident[EI_CLASS];
 }
 
-int checkClass(const Program* program) {
-	return program->common.e_ident[EI_CLASS] == ELFCLASS32;
+uint8_t getData(const Program* program) {
+	return program->common.e_ident[EI_DATA];
+}
+
+uint8_t getElfVersion(const Program* program) {
+	return program->common.e_ident[EI_VERSION];
+}
+
+uint8_t getOSABI(const Program* program) {
+	return program->common.e_ident[EI_OSABI];
+}
+
+uint8_t getABIVERSION(const Program* program) {
+	return program->common.e_ident[EI_ABIVERSION];
+}
+
+uint16_t getType(const Program* program) {
+	return program->common.e_type;
+}
+
+uint16_t getMachine(const Program* program) {
+	return program->common.e_machine;
+}
+
+uint16_t getVersion(const Program* program) {
+	return program->common.e_machine;
+}
+
+bool checkMagic(const Program* program) {
+	return memcmp(program->common.e_ident, ELFMAG, SELFMAG) == 0;
+}
+
+bool checkElfVersion(const Program* program) {
+	return program->common.e_ident[EI_VERSION] == EV_CURRENT;
+}
+
+void setType(Program* program, uint16_t e_type) {
+	program->common.e_type = e_type;
+}
+
+void setMachine(Program* program, uint16_t e_machine) {
+	program->common.e_machine = e_machine;
 }
